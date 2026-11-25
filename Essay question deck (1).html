@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Essay question deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#2338d8; --bg2:#1a2aa8; --paper:#f7f8fc; --ink:#10142e; --sun:#ffc93c; --pink:#ff6b8a; --muted:#5a6086;
+  --font:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#141f7a; --bg2:#0b1250;}
+}
+:root[data-theme="dark"]{--bg:#141f7a; --bg2:#0b1250;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100%;font-family:var(--font);color:var(--paper);
+  background:radial-gradient(120% 90% at 50% 0%,var(--bg) 0%,var(--bg2) 100%);background-color:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:24px 16px;overflow-x:hidden;
+}
+h1{margin:0;font-size:clamp(1.1rem,3.2vw,1.35rem);font-weight:500;letter-spacing:.01em;opacity:.9;text-align:center}
+.stage{position:relative;width:min(92vw,540px);height:clamp(330px,58vh,420px);perspective:1400px}
+.card{position:absolute;inset:0;border-radius:24px}
+.back{background:var(--paper);box-shadow:0 18px 40px rgba(5,8,50,.35)}
+.c1{background:var(--pink);transform:rotate(-5deg) translate(-6px,6px)}
+.c2{background:var(--sun);transform:rotate(4deg) translate(8px,4px)}
+.c3{background:#dfe3fb;transform:rotate(-1.5deg) translateY(10px)}
+.shuffling .c1{animation:l .9s cubic-bezier(.6,0,.3,1)}
+.shuffling .c2{animation:r .9s cubic-bezier(.6,0,.3,1)}
+.shuffling .c3{animation:u .9s cubic-bezier(.6,0,.3,1)}
+@keyframes l{0%{transform:rotate(-5deg) translate(-6px,6px)}45%{transform:rotate(-16deg) translate(-62%,-4%);z-index:5}100%{transform:rotate(-5deg) translate(-6px,6px)}}
+@keyframes r{0%{transform:rotate(4deg) translate(8px,4px)}45%{transform:rotate(15deg) translate(62%,-2%);z-index:5}100%{transform:rotate(4deg) translate(8px,4px)}}
+@keyframes u{0%{transform:rotate(-1.5deg) translateY(10px)}45%{transform:rotate(3deg) translateY(-18%)}100%{transform:rotate(-1.5deg) translateY(10px)}}
+.flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.3,1.2,.4,1);transform:rotateY(180deg);cursor:pointer;z-index:3}
+.flip.show{transform:rotateY(0)}
+.face{position:absolute;inset:0;border-radius:24px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;box-shadow:0 22px 50px rgba(5,8,50,.4)}
+.front{background:var(--paper);color:var(--ink);padding:clamp(22px,5vw,38px);display:flex;flex-direction:column;justify-content:space-between}
+.front::before{content:"";position:absolute;left:0;top:0;bottom:0;width:10px;background:linear-gradient(var(--pink),var(--sun))}
+.meta{font-size:.9rem;color:var(--muted);font-weight:500;padding-left:6px}
+.q{margin:0;font-size:clamp(1.35rem,4.9vw,2.05rem);line-height:1.18;font-weight:700;letter-spacing:-.015em;padding-left:6px}
+.w{display:inline-block;opacity:0;transform:translateY(.7em) rotate(2deg);transition:opacity .4s,transform .5s cubic-bezier(.2,.8,.3,1)}
+.show .w{opacity:1;transform:none;transition-delay:calc(var(--i) * 38ms + 420ms)}
+.ask{padding-left:6px;font-size:.98rem;font-weight:500;color:var(--muted);opacity:0;transition:opacity .5s 1.3s}
+.show .ask{opacity:1}
+.cardback{transform:rotateY(180deg);background:var(--ink);display:grid;place-items:center;
+  background-image:radial-gradient(circle at 1px 1px,rgba(255,201,60,.35) 1.4px,transparent 1.6px);background-size:18px 18px}
+.cardback span{font-size:clamp(5rem,22vw,8.5rem);font-weight:700;color:var(--sun);line-height:1;transform:rotate(-6deg);text-shadow:6px 6px 0 var(--pink)}
+.controls{display:flex;flex-direction:column;align-items:center;gap:16px}
+button{font:inherit;font-weight:700;font-size:1.05rem;color:var(--ink);background:var(--sun);border:0;border-radius:999px;padding:14px 30px;cursor:pointer;
+  box-shadow:0 5px 0 #c99500;transition:transform .12s,box-shadow .12s}
+button:hover{transform:translateY(-2px)}
+button:active{transform:translateY(4px);box-shadow:0 1px 0 #c99500}
+button:focus-visible,.flip:focus-visible{outline:3px solid var(--paper);outline-offset:4px}
+.dots{display:flex;gap:7px}
+.dots i{width:10px;height:10px;border-radius:50%;border:2px solid rgba(247,248,252,.55);transition:background .3s,transform .3s}
+.dots i.on{background:var(--paper);border-color:var(--paper)}
+.dots i.now{background:var(--sun);border-color:var(--sun);transform:scale(1.35)}
+.count{font-size:.9rem;opacity:.8;min-height:1.2em}
+.dots{flex-wrap:wrap;justify-content:center;max-width:300px}
+.dots i{width:9px;height:9px}
+.app{display:flex;flex-direction:column;align-items:center;gap:28px;width:100%}
+#setup{display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center;width:min(92vw,460px)}
+#setup[hidden],.app[hidden]{display:none}
+#setup h2{margin:0;font-size:clamp(1.6rem,6vw,2.3rem);line-height:1.1;letter-spacing:-.02em}
+#setup p{margin:0;opacity:.85;max-width:38ch;line-height:1.4}
+.rv{font-size:clamp(3.5rem,16vw,5.5rem);font-weight:700;color:var(--sun);line-height:1;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--sun);height:32px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.chip{box-shadow:none;background:transparent;color:var(--paper);border:2px solid rgba(247,248,252,.5);padding:8px 16px;font-size:.95rem}
+.chip:hover{background:rgba(247,248,252,.12)}
+.chip:active{box-shadow:none;transform:none}
+.timer{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center}
+.ring{width:64px;height:64px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:6}
+.ring .tr{stroke:rgba(247,248,252,.22)}
+.ring .pg{stroke:var(--sun);stroke-linecap:round;stroke-dasharray:163.36;transition:stroke .3s}
+.tx{text-align:left;min-width:130px}
+.tnum{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.tlabel{font-size:.9rem;opacity:.85}
+.timer.done .pg{stroke:var(--pink)}
+.timer.done .ring{animation:pulse .6s 3}
+@keyframes pulse{50%{transform:rotate(-90deg) scale(1.15)}}
+.link{background:none;box-shadow:none;color:var(--paper);font-weight:500;font-size:.9rem;text-decoration:underline;padding:4px 8px;opacity:.85}
+.link:hover,.link:active{transform:none;box-shadow:none;opacity:1}
+@media (prefers-reduced-motion:reduce){
+  .timer.done .ring{animation:none}
+  .shuffling .card{animation:none!important}
+  .flip{transition:opacity .3s,transform 0s}
+  .w{transform:none;transition:opacity .3s}
+  .show .w{transition-delay:0s}
+}
+</style>
+</head>
+<body>
+<section id="setup">
+  <h2>How long do you want to brainstorm?</h2>
+  <p>Pick a time between 30 seconds and 3 minutes. The countdown starts each time a question card flips.</p>
+  <div class="rv" id="rv">1:00</div>
+  <input type="range" id="rng" min="30" max="180" step="5" value="60" aria-label="Brainstorm time in seconds">
+  <div class="chips">
+    <button class="chip" type="button" data-s="30">30 sec</button>
+    <button class="chip" type="button" data-s="60">1 min</button>
+    <button class="chip" type="button" data-s="90">1.5 min</button>
+    <button class="chip" type="button" data-s="120">2 min</button>
+    <button class="chip" type="button" data-s="150">2.5 min</button>
+    <button class="chip" type="button" data-s="180">3 min</button>
+  </div>
+  <button id="go" type="button">Start session</button>
+</section>
+<div class="app" id="app" hidden>
+<h1>Essay question deck</h1>
+<div class="stage" id="stage">
+  <div class="card back c3"></div>
+  <div class="card back c2"></div>
+  <div class="card back c1"></div>
+  <div class="flip" id="flip" tabindex="0" role="button" aria-label="Draw a question">
+    <div class="face front">
+      <div class="meta" id="meta"></div>
+      <p class="q" id="q" aria-live="polite"></p>
+      <div class="ask">To what extent do you agree or disagree?</div>
+    </div>
+    <div class="face cardback"><span>?</span></div>
+  </div>
+</div>
+<div class="controls">
+  <div class="timer" id="timer">
+    <svg class="ring" viewBox="0 0 64 64" aria-hidden="true"><circle class="tr" cx="32" cy="32" r="26"/><circle class="pg" id="ring" cx="32" cy="32" r="26"/></svg>
+    <div class="tx"><div class="tnum" id="tnum" role="timer">1:00</div><div class="tlabel" id="tlabel"></div></div>
+    <button class="link" id="change" type="button">Change time</button>
+  </div>
+  <button id="btn" type="button">Draw a question</button>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <div class="count" id="count">20 questions in the deck</div>
+</div>
+</div>
+<script>
+const Q=[
+"Some people believe that university education should be free for all students.",
+"Governments should invest more money in public transport than in building new roads.",
+"Social media has done more harm than good to society.",
+"Children should be taught how to manage money at school.",
+"Companies should be required to allow employees to work from home at least part of the week.",
+"The best way to reduce crime is to give longer prison sentences to offenders.",
+"Governments should ban private cars from city centres to reduce pollution and traffic congestion.",
+"Traditional classrooms will eventually be replaced by online learning.",
+"Professional athletes earn too much money compared with other important professionals, such as teachers and nurses.",
+"Everyone should be required to do voluntary community work as part of their education.",
+"Governments should make public transport completely free in large cities.",
+"Advertising aimed at children should be banned.",
+"People should be legally required to recycle household waste.",
+"Governments should spend more money on preventing illness than on treating people who are already sick.",
+"International tourism benefits local communities more than it harms them.",
+"Zoos are no longer necessary in the modern world.",
+"Artificial intelligence will create more jobs than it destroys.",
+"Parents should limit the amount of time their children spend using smartphones and other electronic devices.",
+"Fast food should be taxed in the same way as tobacco and alcohol.",
+"Celebrities have a responsibility to use their fame to promote social and environmental causes."
+];
+const $=id=>document.getElementById(id);
+const flip=$('flip'),stage=$('stage'),q=$('q'),btn=$('btn'),dots=$('dots'),count=$('count'),meta=$('meta');
+Q.forEach(()=>dots.appendChild(document.createElement('i')));
+let bag=[],seen=new Set(),last=-1,busy=false,drawn=0;
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function pick(){
+  if(!bag.length){bag=shuffle(Q.map((_,i)=>i));if(bag[bag.length-1]===last&&bag.length>1){bag.unshift(bag.pop())}seen.clear()}
+  return bag.pop();
+}
+function render(i){
+  q.textContent='';
+  Q[i].split(' ').forEach((word,k)=>{
+    const s=document.createElement('span');s.className='w';s.style.setProperty('--i',k);s.textContent=word;
+    q.appendChild(s);q.appendChild(document.createTextNode(' '));
+  });
+  [...dots.children].forEach((d,k)=>d.className=seen.has(k)?(k===i?'now':'on'):'');
+  const left=bag.length;
+  meta.textContent='Question '+(Q.length-left)+' of '+Q.length;
+  count.textContent=left?left+' left in this deck':'Last card. The next draw reshuffles.';
+}
+function draw(){
+  if(busy)return;busy=true;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  flip.classList.remove('show');
+  resetTimer();
+  stage.classList.add('shuffling');
+  const i=pick();last=i;seen.add(i);
+  setTimeout(()=>render(i),reduce?0:450);
+  setTimeout(()=>{stage.classList.remove('shuffling');flip.classList.add('show');btn.textContent='Draw another';startTimer()},reduce?200:1000);
+  setTimeout(()=>{busy=false},reduce?400:1900);
+}
+const app=$('app'),setup=$('setup'),rng=$('rng'),rv=$('rv'),ring=$('ring'),tnum=$('tnum'),tlabel=$('tlabel'),timerEl=$('timer');
+const CIRC=2*Math.PI*26;
+let total=60,remain=60,tick=null,endAt=0,actx=null;
+function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function paint(){tnum.textContent=fmt(Math.ceil(remain));ring.style.strokeDashoffset=CIRC*(1-remain/total)}
+function resetTimer(){clearInterval(tick);tick=null;remain=total;timerEl.classList.remove('done');tlabel.textContent='Starts when the card flips';paint()}
+function chime(){try{if(!actx)return;[880,1175].forEach((f,k)=>{const o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=f;o.connect(g);g.connect(actx.destination);const t=actx.currentTime+k*.22;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25,t+.03);g.gain.exponentialRampToValueAtTime(.0001,t+.5);o.start(t);o.stop(t+.55)})}catch(e){}}
+function startTimer(){
+  resetTimer();tlabel.textContent='Brainstorm your ideas';endAt=Date.now()+total*1000;
+  tick=setInterval(()=>{
+    remain=Math.max(0,(endAt-Date.now())/1000);paint();
+    if(remain<=0){clearInterval(tick);tick=null;timerEl.classList.add('done');tlabel.textContent="Time's up. Start writing.";chime()}
+  },100);
+}
+function showVal(){rv.textContent=fmt(+rng.value)}
+rng.addEventListener('input',showVal);showVal();
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{rng.value=c.dataset.s;showVal()}));
+$('go').addEventListener('click',()=>{
+  total=Math.min(180,Math.max(30,+rng.value));
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.resume)actx.resume()}catch(e){}
+  setup.hidden=true;app.hidden=false;
+  if(flip.classList.contains('show'))startTimer();else resetTimer();
+});
+$('change').addEventListener('click',()=>{resetTimer();setup.hidden=false;app.hidden=true;rng.value=total;showVal()});
+btn.addEventListener('click',draw);
+flip.addEventListener('click',draw);
+flip.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();draw()}});
+document.addEventListener('keydown',e=>{if(e.key===' '&&!app.hidden&&document.activeElement===document.body){e.preventDefault();draw()}});
+</script>
+</body>
+</html>
